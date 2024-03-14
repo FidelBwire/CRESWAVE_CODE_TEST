@@ -31,7 +31,7 @@ public class UserProfile {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	private String profileId;
+	private String id;
 
 	@Column(nullable = false)
 	private String fullName;
@@ -44,7 +44,7 @@ public class UserProfile {
 
 //	@Column(nullable = true, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	@UpdateTimestamp
-	private Timestamp updatedOn;
+	private Timestamp lastUpdatedOn;
 
 //	@Column(columnDefinition = "TIMESTAMP")
 	private Timestamp lastSignIn;

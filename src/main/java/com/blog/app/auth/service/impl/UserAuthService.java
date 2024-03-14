@@ -31,8 +31,9 @@ import com.blog.app.auth.exceptions.handlers.DisabledUserException;
 import com.blog.app.auth.exceptions.handlers.ForbiddenActionException;
 import com.blog.app.auth.exceptions.handlers.InvalidUserCredentialsException;
 import com.blog.app.auth.repository.UserRepository;
+import com.blog.app.main.dto.response.UserProfileResponse;
 import com.blog.app.main.entity.UserProfile;
-import com.blog.app.main.service.UserProfileService;
+import com.blog.app.main.repository.UserProfileRepository;
 
 @Service
 public class UserAuthService implements UserDetailsService {
@@ -47,7 +48,7 @@ public class UserAuthService implements UserDetailsService {
 	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	private UserProfileService userProfileService;
+	private UserProfileRepository userProfileRepository;
 
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -64,11 +65,16 @@ public class UserAuthService implements UserDetailsService {
 
 		User user = userRepository.findByEmail(request.getEmail()).get();
 
-//		UserProfile userProfile = user.getProfile();
-//		userProfile.setLastSignIn(new Timestamp(System.currentTimeMillis()));
-		user = userRepository.save(user);
+		UserProfile profile = userProfileRepository.findProfileByUserId(user.getId()).get();
+		profile.setLastSignIn(new Timestamp(System.currentTimeMillis()));
+		profile = userProfileRepository.save(profile);
 
-		return SignInResponse.builder().authToken(token).roles(new ArrayList<String>(roles)).build();
+		UserProfileResponse userProfile = UserProfileResponse.builder().userId(user.getId())
+				.username(user.getUsername()).fullName(profile.getFullName()).email(user.getEmail())
+				.joinedOn(profile.getJoinedOn().getTime()).lastUpdatedOn(profile.getLastUpdatedOn().getTime())
+				.lastSignIn(profile.getLastSignIn().getTime()).build();
+		return SignInResponse.builder().authToken(token).roles(new ArrayList<String>(roles))
+				.authority(user.getAuthority()).userProfile(userProfile).build();
 	}
 
 	@Override
@@ -96,13 +102,15 @@ public class UserAuthService implements UserDetailsService {
 					"Username or email has already been registered with a different account");
 		}
 
-		UserProfile profile = UserProfile.builder().fullName(signUpRequest.getFullName())
-				.lastSignIn(new Timestamp(System.currentTimeMillis())).build();
-
+		// Save the user details
 		User user = User.builder().username(username).password(passwordEncoder.encode(signUpRequest.getPassword()))
 				.email(email).build();
+		User newUser = userRepository.save(user);
 
-		userRepository.save(user);
+		// Initialize user profile
+		UserProfile profile = UserProfile.builder().fullName(signUpRequest.getFullName()).user(newUser).lastSignIn(null)
+				.build();
+		userProfileRepository.save(profile);
 
 		// Sign in the user right away, since the approach does not require any further
 		// validation actions, such as 2FA

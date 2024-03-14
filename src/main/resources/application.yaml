@@ -10,8 +10,8 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl: ${JPA_DDL:update}
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      ddl: ${JPA_DDL:create}
+      ddl-auto: ${JPA_DDL_AUTO:create}
   main:
     allow-circular-references: true
   

@@ -27,7 +27,7 @@ public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		httpServletResponse.setStatus(401);
 		OutputStream out = httpServletResponse.getOutputStream();
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(out, null);
+		mapper.writeValue(out, apiError);
 		out.flush();
 	}
 }
