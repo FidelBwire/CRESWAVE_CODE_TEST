@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.blog.app.auth.dto.request.SignInRequest;
 import com.blog.app.auth.dto.request.SignUpRequest;
 import com.blog.app.auth.dto.response.SignInResponse;
-import com.blog.app.auth.service.UserAuthService;
+import com.blog.app.auth.service.impl.UserAuthService;
 
 import jakarta.validation.Valid;
 

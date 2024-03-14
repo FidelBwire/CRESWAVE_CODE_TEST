@@ -1,4 +1,4 @@
-package com.blog.app.auth.service;
+package com.blog.app.auth.service.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import com.blog.app.auth.exceptions.handlers.ForbiddenActionException;
 import com.blog.app.auth.exceptions.handlers.InvalidUserCredentialsException;
 import com.blog.app.auth.repository.UserRepository;
 import com.blog.app.main.entity.UserProfile;
-import com.blog.app.main.repository.UserProfileRepository;
+import com.blog.app.main.service.UserProfileService;
 
 @Service
 public class UserAuthService implements UserDetailsService {
@@ -47,7 +47,7 @@ public class UserAuthService implements UserDetailsService {
 	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	private UserProfileRepository userProfileRepository;
+	private UserProfileService userProfileService;
 
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -64,8 +64,8 @@ public class UserAuthService implements UserDetailsService {
 
 		User user = userRepository.findByEmail(request.getEmail()).get();
 
-		UserProfile userProfile = user.getProfile();
-		userProfile.setLastSignIn(new Timestamp(System.currentTimeMillis()));
+//		UserProfile userProfile = user.getProfile();
+//		userProfile.setLastSignIn(new Timestamp(System.currentTimeMillis()));
 		user = userRepository.save(user);
 
 		return SignInResponse.builder().authToken(token).roles(new ArrayList<String>(roles)).build();
@@ -100,7 +100,7 @@ public class UserAuthService implements UserDetailsService {
 				.lastSignIn(new Timestamp(System.currentTimeMillis())).build();
 
 		User user = User.builder().username(username).password(passwordEncoder.encode(signUpRequest.getPassword()))
-				.email(email).profile(profile).build();
+				.email(email).build();
 
 		userRepository.save(user);
 

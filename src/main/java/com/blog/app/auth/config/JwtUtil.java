@@ -45,9 +45,10 @@ public class JwtUtil {
 				.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
 	}
 
-	public void validateToken(final String token) {
+	public boolean validateToken(final String token) {
 		try {
 			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+			return true;
 		} catch (SignatureException ex) {
 			throw new JwtTokenMalformedException("Invalid JWT signature");
 		} catch (MalformedJwtException ex) {
