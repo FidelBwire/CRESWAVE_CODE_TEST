@@ -15,12 +15,13 @@ import lombok.NoArgsConstructor;
 public class UserProfileUpdateRequest {
 
 	@NotNull(message = "Full name should not be null")
-	@Size(min = 1, message = "Full name is required")
+	@Size(min = 1, message = "Full name is a required field")
 	@Size(max = 50, message = "Full name should be a maximum of 50 characters long")
 	private String fullName;
 
 	@NotNull(message = "Email should not be null")
 	@Email(message = "Wrong email address format")
+	@Size(min = 1, message = "Email is a required field")
 	@Size(max = 100, message = "Email should be a maximum of 100 characters long")
 	private String email;
 

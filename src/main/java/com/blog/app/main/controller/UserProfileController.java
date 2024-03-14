@@ -26,7 +26,7 @@ public class UserProfileController {
 	@GetMapping
 	public ResponseEntity<UserProfileResponse> getUserProfile(HttpServletRequest servletRequest) {
 		UserProfileResponse profileResponse = userProfileService.getUserProfile(servletRequest);
-		return new ResponseEntity<UserProfileResponse>(profileResponse, HttpStatus.OK);
+		return new ResponseEntity<>(profileResponse, HttpStatus.OK);
 	}
 
 	@PutMapping()
@@ -34,6 +34,6 @@ public class UserProfileController {
 			@Valid @RequestBody UserProfileUpdateRequest profileUpdateRequest) {
 		UserProfileResponse profileResponse = userProfileService.updateUserProfile(servletRequest,
 				profileUpdateRequest);
-		return new ResponseEntity<UserProfileResponse>(profileResponse, HttpStatus.OK);
+		return new ResponseEntity<>(profileResponse, HttpStatus.OK);
 	}
 }
