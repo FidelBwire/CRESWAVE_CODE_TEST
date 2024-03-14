@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 public class UserProfileResponse {
 
 	private String userId;
-	private String username;
+	private String userName;
 	private String fullName;
 	private String email;
+	private String phoneNumber;
 	private Long joinedOn;
 	private Long lastUpdatedOn;
 	private Long lastSignIn;

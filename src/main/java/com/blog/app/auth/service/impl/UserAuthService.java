@@ -35,6 +35,8 @@ import com.blog.app.main.dto.response.UserProfileResponse;
 import com.blog.app.main.entity.UserProfile;
 import com.blog.app.main.repository.UserProfileRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Service
 public class UserAuthService implements UserDetailsService {
 
@@ -70,9 +72,10 @@ public class UserAuthService implements UserDetailsService {
 		profile = userProfileRepository.save(profile);
 
 		UserProfileResponse userProfile = UserProfileResponse.builder().userId(user.getId())
-				.username(user.getUsername()).fullName(profile.getFullName()).email(user.getEmail())
-				.joinedOn(profile.getJoinedOn().getTime()).lastUpdatedOn(profile.getLastUpdatedOn().getTime())
-				.lastSignIn(profile.getLastSignIn().getTime()).build();
+				.userName(user.getUsername()).fullName(profile.getFullName()).email(user.getEmail())
+				.phoneNumber(profile.getPhoneNumber()).joinedOn(profile.getJoinedOn().getTime())
+				.lastUpdatedOn(profile.getLastUpdatedOn().getTime()).lastSignIn(profile.getLastSignIn().getTime())
+				.build();
 		return SignInResponse.builder().authToken(token).roles(new ArrayList<String>(roles))
 				.authority(user.getAuthority()).userProfile(userProfile).build();
 	}
@@ -121,6 +124,20 @@ public class UserAuthService implements UserDetailsService {
 
 	public void updateUser(User user) {
 		userRepository.save(user);
+	}
+
+	public User getUserInSession(HttpServletRequest request) {
+		String header = request.getHeader("Authorization");
+		String token = header.substring("Bearer".length() + 1);
+		String username = jwtUtil.getUserName(token);
+		User user;
+		try {
+			user = userRepository.findByEmail(username).get();
+		} catch (NoSuchElementException e) {
+			throw new InvalidUserCredentialsException("Invalid user credentials");
+		}
+
+		return user;
 	}
 
 	private Authentication authenticateCredentials(String email, String password) {

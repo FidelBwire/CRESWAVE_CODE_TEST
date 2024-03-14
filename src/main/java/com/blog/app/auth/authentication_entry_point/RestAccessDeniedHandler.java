@@ -21,7 +21,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
 	@Override
 	public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
 			AccessDeniedException e) throws IOException, ServletException {
-		ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, "Access to the requested resources has been denied");
+		ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, e.getLocalizedMessage());
 		httpServletResponse.setStatus(401);
 		OutputStream out = httpServletResponse.getOutputStream();
 		ObjectMapper mapper = new ObjectMapper();

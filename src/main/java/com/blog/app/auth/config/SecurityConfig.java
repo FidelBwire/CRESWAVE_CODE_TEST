@@ -44,8 +44,8 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(authority -> authority.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.anyRequest().authenticated());
+		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(authority -> authority
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated());
 		http.userDetailsService(userAuthService());
 		http.exceptionHandling(handling -> handling.accessDeniedHandler(accessDeniedHandler)
 				.authenticationEntryPoint(authenticationEntryPoint));

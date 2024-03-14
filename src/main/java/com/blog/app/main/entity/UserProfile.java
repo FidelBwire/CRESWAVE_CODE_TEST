@@ -36,6 +36,8 @@ public class UserProfile {
 	@Column(nullable = false)
 	private String fullName;
 
+	private String phoneNumber;
+
 	// Older versions of MySql Server use TIMESTAMP in column definition. DateTime
 	// throws an exception. Uncomment as necessary
 //	@Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
