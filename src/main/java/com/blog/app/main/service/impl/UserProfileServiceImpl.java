@@ -53,8 +53,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 		UserProfile profile = userProfileRepository.findProfileByUserId(user.getId()).get();
 
 		return UserProfileResponse.builder().userId(user.getId()).userName(user.getUsername())
-				.fullName(profile.getFullName()).email(user.getEmail()).joinedOn(profile.getJoinedOn().getTime())
-				.lastUpdatedOn(profile.getLastUpdatedOn().getTime()).lastSignIn(profile.getLastSignIn().getTime())
-				.build();
+				.fullName(profile.getFullName()).email(user.getEmail()).phoneNumber(profile.getPhoneNumber())
+				.joinedOn(profile.getJoinedOn().getTime()).lastUpdatedOn(profile.getLastUpdatedOn().getTime())
+				.lastSignIn(profile.getLastSignIn().getTime()).build();
 	}
 }
