@@ -51,6 +51,6 @@ public class BlogPost {
 	@UpdateTimestamp
 	private Timestamp lastUpdatedOn;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Comment> comments;
 }

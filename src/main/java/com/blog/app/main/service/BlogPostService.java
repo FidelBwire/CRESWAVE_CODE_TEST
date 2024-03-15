@@ -10,6 +10,9 @@ public interface BlogPostService {
 
 	BlogPostResponse createBlogPost(HttpServletRequest servletRequest, BlogPostRequest blogPostRequest);
 
-	BlogPostResponse updateBlogPost(HttpServletRequest servletRequest, @Valid BlogPostRequest blogPostRequest);
+	BlogPostResponse updateBlogPost(HttpServletRequest servletRequest, String blogId,
+			@Valid BlogPostRequest blogPostRequest);
+
+	String deleteBlogPost(HttpServletRequest servletRequest, String blogId);
 
 }
