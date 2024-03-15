@@ -1,7 +1,15 @@
 package com.blog.app.main.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.blog.app.auth.entity.User;
@@ -11,8 +19,11 @@ import com.blog.app.auth.exceptions.handlers.ResourceNotFoundException;
 import com.blog.app.auth.service.impl.UserAuthService;
 import com.blog.app.main.dto.request.BlogPostRequest;
 import com.blog.app.main.dto.response.BlogPostResponse;
+import com.blog.app.main.dto.response.BlogPostSummaryResponse;
 import com.blog.app.main.entity.BlogPost;
+import com.blog.app.main.entity.BlogPostSummary;
 import com.blog.app.main.repository.BlogPostRepository;
+import com.blog.app.main.repository.BlogPostSummaryRepository;
 import com.blog.app.main.service.BlogPostService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +36,27 @@ public class BlogPostServiceImpl implements BlogPostService {
 	private BlogPostRepository blogPostRepository;
 
 	@Autowired
+	private BlogPostSummaryRepository blogPostSummaryRepository;
+
+	@Autowired
 	private UserAuthService userAuthService;
+
+	@Override
+	public Page<BlogPostSummaryResponse> getBlogPosts(int page, int size, String orderBy, String direction,
+			Optional<String> title, Optional<String> content) {
+		Order order = direction.equalsIgnoreCase("asc") ? Order.asc(orderBy) : Order.desc(orderBy);
+		Sort sort = Sort.by(order);
+		PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+		Page<BlogPostSummary> blogs = blogPostSummaryRepository.findAll(pageRequest);
+		List<BlogPostSummaryResponse> blogResponse = blogs.getContent().stream()
+				.map(blog -> BlogPostSummaryResponse.builder().id(blog.getId()).authorId(blog.getAuthor().getId())
+						.author(blog.getAuthor().getUsername()).title(blog.getTitle())
+						.createdOn(blog.getCreatedOn().getTime()).lastUpdatedOn(blog.getLastUpdatedOn().getTime())
+						.build())
+				.toList();
+		return new PageImpl<>(blogResponse, pageRequest, blogs.getTotalElements());
+	}
 
 	@Override
 	public BlogPostResponse createBlogPost(HttpServletRequest servletRequest, BlogPostRequest blogPostRequest) {

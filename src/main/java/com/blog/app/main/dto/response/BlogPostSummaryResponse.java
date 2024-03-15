@@ -9,7 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class CommentResponse {
+public class BlogPostSummaryResponse {
 
-	private Long id;
+	private String id;
+	private String authorId;
+	private String author;
+	private String title;
+	private Long createdOn;
+	private Long lastUpdatedOn;
 }
