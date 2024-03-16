@@ -41,8 +41,8 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authority -> authority.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/auth/signin", "/auth/signup").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/blogs/{blogId}").hasAuthority("ADMIN").anyRequest()
-						.hasAnyAuthority("ADMIN", "USER"));
+						.requestMatchers(HttpMethod.DELETE, "/blogs/{blogId}").hasAuthority("ROLE_ADMIN").anyRequest()
+						.hasAnyAuthority("ROLE_ADMIN", "ROLE_USER"));
 		http.userDetailsService(userAuthService());
 		http.exceptionHandling(handling -> handling.accessDeniedHandler(accessDeniedHandler)
 				.authenticationEntryPoint(authenticationEntryPoint));
