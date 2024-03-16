@@ -48,6 +48,9 @@ public class Comment {
 	@UpdateTimestamp
 	private Timestamp lastUpdatedOn;
 
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	private BlogPost blogPost;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<Comment> comments;
 }

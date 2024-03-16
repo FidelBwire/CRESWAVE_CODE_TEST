@@ -64,6 +64,8 @@ public class BlogPostServiceImpl implements BlogPostService {
 
 		BlogPost blogPost = BlogPost.builder().author(userInSession).title(blogPostRequest.getTitle())
 				.content(blogPostRequest.getContent()).build();
+		System.out.println("userInSession: " + userInSession);
+		System.out.println("blogPost: " + blogPost);
 		BlogPost newBlogPost = blogPostRepository.save(blogPost);
 
 		BlogPostResponse blogPostResponse = createBlogPostResponse(newBlogPost, userInSession);
