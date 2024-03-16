@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.blog.app.auth.entity.User;
+import com.blog.app.auth.exceptions.handlers.ForbiddenActionException;
 import com.blog.app.auth.exceptions.handlers.ResourceNotFoundException;
 import com.blog.app.auth.service.impl.UserAuthService;
 import com.blog.app.main.dto.request.CommentRequest;
@@ -38,14 +39,17 @@ public class CommentServiceImpl implements CommentService {
 	private BlogPostRepository blogPostRepository;
 
 	@Override
-	public Page<CommentResponse> getBlogComments(int page, int size) {
-		Order order = Order.asc("createdOn");
+	public Page<CommentResponse> getBlogComments(int page, int size, String blogId) {
+		Order order = Order.asc("created_on");
 		Sort sort = Sort.by(order);
-		PageRequest pageRequest = PageRequest.of(page, size, sort);
+		PageRequest pageRequest = PageRequest.of(page - 1, size, sort);
 
-		Page<Comment> comments = commentRepository.findAll(pageRequest);
-		List<CommentResponse> commentsResponse = comments.stream()
-				.map(comment -> CommentResponse.builder().id(comment.getId()).build()).toList();
+		if (!blogPostRepository.existsById(blogId)) {
+			throw new ResourceNotFoundException("Invalid blog Id: " + blogId);
+		}
+
+		Page<Comment> comments = commentRepository.findBlogComments(blogId, pageRequest);
+		List<CommentResponse> commentsResponse = comments.stream().map(this::createCommentResponse).toList();
 
 		return new PageImpl<>(commentsResponse, pageRequest, comments.getTotalElements());
 	}
@@ -62,9 +66,57 @@ public class CommentServiceImpl implements CommentService {
 		return createCommentResponse(newComment);
 	}
 
+	@Override
+	public CommentResponse commentOnComment(HttpServletRequest servletRequest, Long commentId,
+			@Valid CommentRequest commentRequest) {
+		User user = authService.getUserInSession(servletRequest);
+
+		Comment parentComment = commentRepository.findById(commentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Invalid parent comment Id: " + commentId));
+
+		Comment comment = Comment.builder().user(user).content(commentRequest.getComment()).build();
+		Comment newComment = commentRepository.save(comment);
+
+		parentComment.getComments().add(newComment);
+		commentRepository.save(parentComment);
+
+		return createCommentResponse(newComment);
+	}
+
+	@Override
+	public CommentResponse updateComment(HttpServletRequest servletRequest, Long commentId,
+			@Valid CommentRequest commentRequest) {
+		User user = authService.getUserInSession(servletRequest);
+		Comment comment = getUserComment(user, commentId);
+		comment.setContent(commentRequest.getComment());
+		comment = commentRepository.save(comment);
+
+		return createCommentResponse(comment);
+	}
+
+	@Override
+	public String deleteComment(HttpServletRequest servletRequest, Long commentId) {
+		User user = authService.getUserInSession(servletRequest);
+		Comment comment = getUserComment(user, commentId);
+
+		commentRepository.delete(comment);
+		return "Deleted successfully";
+	}
+
 	private BlogPost getBlogPost(String blogId) {
 		return blogPostRepository.findById(blogId)
 				.orElseThrow(() -> new ResourceNotFoundException("Invalid blog Id: " + blogId));
+	}
+
+	private Comment getUserComment(User user, Long commentId) {
+		Comment comment = commentRepository.findById(commentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Invalid comment Id: " + commentId));
+
+		if (!comment.getUser().getId().equals(user.getId())) {
+			throw new ForbiddenActionException("Action forbidden. Acess denied for the comment " + commentId);
+		}
+
+		return comment;
 	}
 
 	private CommentResponse createCommentResponse(Comment comment) {

@@ -39,9 +39,15 @@ public class BlogPostController {
 			@RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
 			@RequestParam(name = "title", required = false) Optional<String> title,
 			@RequestParam(name = "content", required = false) Optional<String> content) {
-		Page<BlogPostSummaryResponse> blogs = blogPostService.getBlogPosts(page - 1, size, orderBy, direction, title,
+		Page<BlogPostSummaryResponse> blogs = blogPostService.getBlogPosts(page, size, orderBy, direction, title,
 				content);
 		return new ResponseEntity<>(blogs, HttpStatus.OK);
+	}
+
+	@GetMapping("/{blogId}")
+	public ResponseEntity<BlogPostResponse> getBlogPost(@PathVariable(required = true) String blogId) {
+		BlogPostResponse postResponse = blogPostService.getBlogPost(blogId);
+		return new ResponseEntity<>(postResponse, HttpStatus.CREATED);
 	}
 
 	@PostMapping

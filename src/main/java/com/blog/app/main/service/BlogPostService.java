@@ -23,4 +23,6 @@ public interface BlogPostService {
 	Page<BlogPostSummaryResponse> getBlogPosts(int page, int size, String orderBy, String direction,
 			Optional<String> title, Optional<String> content);
 
+	BlogPostResponse getBlogPost(String blogId);
+
 }

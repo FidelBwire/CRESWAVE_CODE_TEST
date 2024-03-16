@@ -20,11 +20,13 @@ import com.blog.app.auth.service.impl.UserAuthService;
 import com.blog.app.main.dto.request.BlogPostRequest;
 import com.blog.app.main.dto.response.BlogPostResponse;
 import com.blog.app.main.dto.response.BlogPostSummaryResponse;
+import com.blog.app.main.dto.response.CommentResponse;
 import com.blog.app.main.entity.BlogPost;
 import com.blog.app.main.entity.BlogPostSummary;
 import com.blog.app.main.repository.BlogPostRepository;
 import com.blog.app.main.repository.BlogPostSummaryRepository;
 import com.blog.app.main.service.BlogPostService;
+import com.blog.app.main.service.CommentService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -33,20 +35,23 @@ import jakarta.validation.Valid;
 public class BlogPostServiceImpl implements BlogPostService {
 
 	@Autowired
+	private UserAuthService userAuthService;
+
+	@Autowired
 	private BlogPostRepository blogPostRepository;
 
 	@Autowired
 	private BlogPostSummaryRepository blogPostSummaryRepository;
 
 	@Autowired
-	private UserAuthService userAuthService;
+	private CommentService commentService;
 
 	@Override
 	public Page<BlogPostSummaryResponse> getBlogPosts(int page, int size, String orderBy, String direction,
 			Optional<String> title, Optional<String> content) {
 		Order order = direction.equalsIgnoreCase("asc") ? Order.asc(orderBy) : Order.desc(orderBy);
 		Sort sort = Sort.by(order);
-		PageRequest pageRequest = PageRequest.of(page, size, sort);
+		PageRequest pageRequest = PageRequest.of(page - 1, size, sort);
 
 		Page<BlogPostSummary> blogs = blogPostSummaryRepository.findAll(pageRequest);
 		List<BlogPostSummaryResponse> blogResponse = blogs.getContent().stream()
@@ -59,13 +64,25 @@ public class BlogPostServiceImpl implements BlogPostService {
 	}
 
 	@Override
+	public BlogPostResponse getBlogPost(String blogId) {
+		BlogPost blog = blogPostRepository.findById(blogId)
+				.orElseThrow(() -> new ResourceNotFoundException("Blog post not found: " + blogId));
+
+		Page<CommentResponse> comments = commentService.getBlogComments(1, 10, blogId);
+
+		return BlogPostResponse.builder().id(blog.getId()).authorId(blog.getAuthor().getId())
+				.author(blog.getAuthor().getUsername()).title(blog.getTitle()).content(blog.getContent())
+				.comments(comments).createdOn(blog.getCreatedOn().getTime())
+				.lastUpdatedOn(blog.getLastUpdatedOn().getTime()).build();
+
+	}
+
+	@Override
 	public BlogPostResponse createBlogPost(HttpServletRequest servletRequest, BlogPostRequest blogPostRequest) {
 		User userInSession = userAuthService.getUserInSession(servletRequest);
 
 		BlogPost blogPost = BlogPost.builder().author(userInSession).title(blogPostRequest.getTitle())
 				.content(blogPostRequest.getContent()).build();
-		System.out.println("userInSession: " + userInSession);
-		System.out.println("blogPost: " + blogPost);
 		BlogPost newBlogPost = blogPostRepository.save(blogPost);
 
 		BlogPostResponse blogPostResponse = createBlogPostResponse(newBlogPost, userInSession);

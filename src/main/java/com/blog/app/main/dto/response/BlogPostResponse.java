@@ -1,7 +1,5 @@
 package com.blog.app.main.dto.response;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 import lombok.AllArgsConstructor;
@@ -22,5 +20,5 @@ public class BlogPostResponse {
 	private String content;
 	private Long createdOn;
 	private Long lastUpdatedOn;
-	private List<Page<CommentResponse>> comments;
+	private Page<CommentResponse> comments;
 }
