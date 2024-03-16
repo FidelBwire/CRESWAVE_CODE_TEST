@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.blog.app.auth.entity.User;
 import com.blog.app.auth.exceptions.handlers.ForbiddenAccessException;
-import com.blog.app.auth.exceptions.handlers.ForbiddenActionException;
 import com.blog.app.auth.exceptions.handlers.ResourceNotFoundException;
 import com.blog.app.auth.service.impl.UserAuthService;
 import com.blog.app.main.dto.request.BlogPostRequest;
@@ -111,20 +110,30 @@ public class BlogPostServiceImpl implements BlogPostService {
 		return blogPostResponse;
 	}
 
+//	@Override
+//	public String deleteBlogPost(HttpServletRequest servletRequest, String blogId) {
+//		User userInSession = userAuthService.getUserInSession(servletRequest);
+//
+//		if (!blogPostRepository.existsById(blogId)) {
+//			throw new ResourceNotFoundException("Blog post not found");
+//		}
+//
+//		if (blogPostRepository.existsByAuthorAndId(userInSession, blogId)) {
+//			blogPostRepository.deleteById(blogId);
+//			return "Blog deleted successfully";
+//		} else {
+//			throw new ForbiddenActionException("Access denied! You can only delete your blog posts");
+//		}
+//	}
+
 	@Override
 	public String deleteBlogPost(HttpServletRequest servletRequest, String blogId) {
-		User userInSession = userAuthService.getUserInSession(servletRequest);
-
 		if (!blogPostRepository.existsById(blogId)) {
 			throw new ResourceNotFoundException("Blog post not found");
 		}
 
-		if (blogPostRepository.existsByAuthorAndId(userInSession, blogId)) {
-			blogPostRepository.deleteById(blogId);
-			return "Blog deleted successfully";
-		} else {
-			throw new ForbiddenActionException("Access denied! You can only delete your blog posts");
-		}
+		blogPostRepository.deleteById(blogId);
+		return "Blog deleted successfully";
 	}
 
 	private BlogPostResponse createBlogPostResponse(BlogPost blog, User user) {

@@ -42,7 +42,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests(authority -> authority.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/auth/signin", "/auth/signup").permitAll()
 						.requestMatchers(HttpMethod.DELETE, "/blogs/{blogId}").hasAuthority("ADMIN").anyRequest()
-						.authenticated());
+						.hasAnyAuthority("ADMIN", "USER"));
 		http.userDetailsService(userAuthService());
 		http.exceptionHandling(handling -> handling.accessDeniedHandler(accessDeniedHandler)
 				.authenticationEntryPoint(authenticationEntryPoint));
