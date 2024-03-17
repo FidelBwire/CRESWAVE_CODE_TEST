@@ -1,6 +1,7 @@
 package com.blog.app.main.entity;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -52,5 +53,6 @@ public class Comment {
 	private BlogPost blogPost;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<Comment> comments;
+	@Builder.Default
+	private List<Comment> comments = new ArrayList<>();
 }

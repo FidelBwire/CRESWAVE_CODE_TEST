@@ -49,7 +49,8 @@ public class CommentServiceImpl implements CommentService {
 		}
 
 		Page<Comment> comments = commentRepository.findBlogComments(blogId, pageRequest);
-		List<CommentResponse> commentsResponse = comments.stream().map(this::createCommentResponse).toList();
+		List<CommentResponse> commentsResponse = comments.getContent().stream().map(this::createCommentResponse)
+				.toList();
 
 		return new PageImpl<>(commentsResponse, pageRequest, comments.getTotalElements());
 	}

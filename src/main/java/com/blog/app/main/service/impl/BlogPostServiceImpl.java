@@ -49,8 +49,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 	public Page<BlogPostSummaryResponse> getBlogPosts(int page, int size, String orderBy, String direction,
 			Optional<String> title, Optional<String> content) {
 		Order order = direction.equalsIgnoreCase("asc") ? Order.asc(orderBy) : Order.desc(orderBy);
-		Sort sort = Sort.by(order);
-		PageRequest pageRequest = PageRequest.of(page - 1, size, sort);
+		PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(order));
 
 		Page<BlogPostSummary> blogs = blogPostSummaryRepository.findAll(pageRequest);
 		List<BlogPostSummaryResponse> blogResponse = blogs.getContent().stream()
@@ -137,6 +136,7 @@ public class BlogPostServiceImpl implements BlogPostService {
 	}
 
 	private BlogPostResponse createBlogPostResponse(BlogPost blog, User user) {
+		System.out.println("blog: " + blog);
 		return BlogPostResponse.builder().id(blog.getId()).authorId(user.getId()).author(user.getUsername())
 				.title(blog.getTitle()).content(blog.getContent()).createdOn(blog.getCreatedOn().getTime())
 				.lastUpdatedOn(blog.getLastUpdatedOn().getTime()).build();

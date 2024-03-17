@@ -47,7 +47,4 @@ public class BlogPost {
 
 	@UpdateTimestamp
 	private Timestamp lastUpdatedOn;
-
-//	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "blogPost")
-//	private List<Comment> comments;
 }
